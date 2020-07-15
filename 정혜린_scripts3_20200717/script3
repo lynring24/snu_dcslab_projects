@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# get network card info with vendor, logical name, capacity
+lshw -C network  | grep -e 'vendor\|logical name\|capacity'
+
+# MAC address
+ip addr show | grep 'link/ether'
+
+ethtool eno1 | grep Speed

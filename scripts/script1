@@ -1,8 +1,0 @@
-# !/bin/bash 
-
-# create direcotry for scipt under Documents and move scripts 
-mkdir /Documents/project/
-mv *script /Documents/project
-chmod -R +x /Documents/project
-ls 
-

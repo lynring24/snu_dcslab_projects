@@ -1,0 +1,10 @@
+# !/bin/bash 
+
+# create direcotry for scipt under Documents and move scripts 
+mkdir ./project/
+cp script* ./project
+chmod -R +x ./project
+tree . 
+rm -rf ./project 
+ls 
+
