@@ -1,0 +1,10 @@
+# !/bin/bash 
+
+
+# create directory for chap 04-08
+for idx in $(seq 4 8)
+do 
+	suddo mkdir chap_${idx}
+done
+ls
+

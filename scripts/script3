@@ -1,17 +1,5 @@
 # !/bin/bash 
 
-# create direcotry for scipt under Documents and move scripts 
-mkdir Documents/summer_skool/
-mv *script Documents/summer_skool
-ls 
-
-# create directory for chap 04-08
-for idx in $(seq 4 8)
-do 
-	suddo mkdir chap_${idx}
-done
-ls
-
 # add git repo to current directory
 git init
 git config --global user.email "lync2846@gmail.com"
