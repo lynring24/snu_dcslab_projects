@@ -8,6 +8,8 @@ MODULE_LICENSE("GPL");
 static struct dentry *dir, *inputdir, *ptreedir;
 static struct task_struct *curr;
 
+static struct char * traversed;
+
 // TODO : Read input PID and trace down from the root until access to the passed argument
 // debugfs_create_blob
 
@@ -27,11 +29,22 @@ static ssize_t write_pid_to_input(struct file *fp,
 
         // Tracing process tree from input_pid to init(1) process
 	// list_for_each_entry(pos, head, member) ;
-/*
-	list_for_each_entry(curr, head, member) {
+	struct list_head * tasks = &(curr->list_head);
+	struct list_head * stack;
+	INIT_LIST_HEAD(stack);
+
+	for(curr, curr->pid!=1; curr=curr->parent) {
+		// add current task_struct 
+		list_add(curr, stack);
 
 	}
-*/
+
+	list_for_each(curr, stack,  ) {
+		//append data
+	 	curr->comm ;
+		curr->pid; 
+		
+	}
         // Make Output Format string: process_command (process_id)
 
         return length;
@@ -58,11 +71,11 @@ static int __init dbfs_module_init(void)
 
 	// file to read input 
         // inputdir = debugfs_create_file("input", , , , );
-        inputdir = debugfs_create_file("input", 0644, NULL, NULL, &dbfs_fops);
+        inputdir = debugfs_create_file("input", 0644, dir, NULL, &dbfs_fops);
 
 	// file to write output 
         // Find suitable debugfs API
-        ptreedir = debugfs_create_file("ptree", 0644, NULL, NULL, &dbfs_fops); // Find suitable debugfs API
+        ptreedir = debugfs_create_file("ptree", 0644, dir, traversed, &dbfs_fops); // Find suitable debugfs API
 //#endif	
 
 	printk("dbfs_ptree module initialize done\n");
@@ -76,8 +89,6 @@ static void __exit dbfs_module_exit(void)
 {
         // Implement exit module code
 	
-	debugfs_remove_recursive(ptreedir);
-	debugfs_remove_recursive(inputdir);
 	debugfs_remove_recursive(dir);
 
 	printk("dbfs_ptree module exit\n");
