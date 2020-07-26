@@ -8,6 +8,9 @@ MODULE_LICENSE("GPL");
 static struct dentry *dir, *inputdir, *ptreedir;
 static struct task_struct *curr;
 
+// TODO : Read input PID and trace down from the root until access to the passed argument
+// debugfs_create_blob
+
 static ssize_t write_pid_to_input(struct file *fp, 
                                 const char __user *user_buffer, 
                                 size_t length, 
@@ -15,11 +18,20 @@ static ssize_t write_pid_to_input(struct file *fp,
 {
         pid_t input_pid;
 
-        //sscanf(user_buffer, "%u", &input_pid);
-        //curr = // Find task_struct using input_pid. Hint: pid_task
+	// read input PID
+        sscanf(user_buffer, "%u", &input_pid);
+        // Find task_struct using input_pid. Hint: pid_task
+        curr = pid_task(find_vpid(input_pid), PIDTYPE_PID);
+	printk(KERN_INFO, "input pid : %d\n", input_pid);
+        //curr = find_task_by_vpid(input_pid);
 
         // Tracing process tree from input_pid to init(1) process
+	// list_for_each_entry(pos, head, member) ;
+/*
+	list_for_each_entry(curr, head, member) {
 
+	}
+*/
         // Make Output Format string: process_command (process_id)
 
         return length;
@@ -29,11 +41,14 @@ static const struct file_operations dbfs_fops = {
         .write = write_pid_to_input,
 };
 
+
+//executed when model is inserted
+
 static int __init dbfs_module_init(void)
 {
         // Implement init module code
 
-#if 0
+//#if 0
         dir = debugfs_create_dir("ptree", NULL);
         
         if (!dir) {
@@ -41,19 +56,30 @@ static int __init dbfs_module_init(void)
                 return -1;
         }
 
-        inputdir = debugfs_create_file("input", , , , );
-        ptreedir = debugfs_create_("ptree", , , ); // Find suitable debugfs API
-#endif
-	
+	// file to read input 
+        // inputdir = debugfs_create_file("input", , , , );
+        inputdir = debugfs_create_file("input", 0644, NULL, NULL, &dbfs_fops);
+
+	// file to write output 
+        // Find suitable debugfs API
+        ptreedir = debugfs_create_file("ptree", 0644, NULL, NULL, &dbfs_fops); // Find suitable debugfs API
+//#endif	
+
 	printk("dbfs_ptree module initialize done\n");
 
         return 0;
 }
 
+
+// executed when module is deleted 
 static void __exit dbfs_module_exit(void)
 {
         // Implement exit module code
 	
+	debugfs_remove_recursive(ptreedir);
+	debugfs_remove_recursive(inputdir);
+	debugfs_remove_recursive(dir);
+
 	printk("dbfs_ptree module exit\n");
 }
 
