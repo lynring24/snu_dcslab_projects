@@ -25,12 +25,14 @@ static ssize_t write_pid_to_input(struct file *fp,
 
 	// initialize 
 	length_total = 0;
-	// checkup message
-	printk ("Good Morning\n");
-
-	sscanf(user_buffer, "%u", &input_pid);
+	
+	copy_from_user(&dummy,user_buffer,sizeof(user_buffer));
+	printk ("user id %s\n",dummy);
+	sscanf(dummy, "%u", &input_pid);
+	printk ("start pid : %d \n", input_pid);
 	// Find task_struct using input_pid. Hint: pid_task
 	curr = pid_task(find_get_pid(input_pid), PIDTYPE_PID); 
+	// checkup message
 
 	//invalid input
 	if(!curr)
@@ -85,6 +87,7 @@ static int __init dbfs_module_init(void)
 		return -1;
 	}
 
+	// name, mode, parent, data, fops
 	inputdir = debugfs_create_file("input", 00777, dir, NULL, &dbfs_fwrite);
 	if (!inputdir) {
 		pr_err("Cannot create inputdir file\n");

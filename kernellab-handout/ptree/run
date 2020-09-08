@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+pkill while
+./while & 
+
+PID=$!
+cd /sys/kernel/debug/ptree
+echo $PID >> input 
+cat ptree

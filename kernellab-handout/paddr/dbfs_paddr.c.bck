@@ -44,11 +44,25 @@ static ssize_t read_output(struct file *fp,
 	pte_t *pte;
 	struct page *page; 
 
+        // if 5 level 
 	pgd = pgd_offset(task->mm, vaddr);
+	printk("pgd : %p\n", *pgd);
+	if (pgd_none(*pgd) && pgd_bad(*pgd))
+		goto done;
 	p4d = p4d_offset(pgd, vaddr);
+	printk("p4d : %p\n", *p4d);
+	if (p4d_none(*p4d) && p4d_bad(*p4d))
+		goto done;
 	pud = pud_offset(p4d, vaddr);
+	printk("pud : %p\n", *pud);
+	if (pud_none(*pud) && pud_bad(*pud))
+		goto done;
 	pmd = pmd_offset(pud, vaddr);
-	pte = pte_offset_kernel(pmd, vaddr);
+	printk("pmd : %p\n", *pmd);
+//	if (pmd_none(*pmd) && pmd_bad(*pmd))
+		goto done;
+
+	pte = pte_offset_map(pmd, vaddr);
 	printk("pte : %p\n", *pte);
 	//pte = pte_offset_kernel(pmd, vaddr); //wrapper
 	

@@ -40,6 +40,7 @@ int main(void)
                 exit(-1);
         }
 
+	printf("PADDR :%p, pckt.paddr:%p\n",PADDR, pckt.paddr);
         assert(pckt.paddr == PADDR);
         printf("[TEST CASE]    PASS\n");
 
