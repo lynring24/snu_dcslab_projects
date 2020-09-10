@@ -65,6 +65,7 @@ static ssize_t read_output(struct file *fp,
 	printk("pte : %p\n", pte);
 
 	page = pte_page(*pte);
+	
 	printk("pte_val = 0x%lx\n", pte_val(*pte));
 	printk("pte_index = %lu\n", pte_index(vaddr));
 	if (pte_none(*pte)) {
@@ -76,12 +77,8 @@ static ssize_t read_output(struct file *fp,
 	page_addr = pte_val(*pte) & PAGE_MASK;
 	page_offset = vaddr & ~PAGE_MASK;
 	paddr = page_addr | page_offset;
-	printk("page_addr = %lx, page_offset = %lx\n", page_addr, page_offset);
-	printk("vaddr = %lx, paddr = %lx\n", vaddr, paddr);
-
-
-
 	pckt.paddr = paddr;
+
 	printk("paddr : %p\n",pckt.paddr);
 	copy_to_user(user_buffer, &pckt,  sizeof(struct packet));
 done:
