@@ -7,11 +7,11 @@
 #include <sys/mman.h>
 
 #define DBFS_FILE_PATH  "/sys/kernel/debug/paddr/output"
-#define PADDR   0x42341000
+#define PADDR   0xff000
 
 struct packet {
         pid_t pid;
-        unsigned long  vaddr;
+        unsigned long vaddr;
         unsigned long paddr;
 };
 
@@ -23,8 +23,7 @@ int main(void)
         mem = open("/dev/mem", O_RDWR);
 
         pckt.pid = getpid();
-        pckt.vaddr = (unsigned long)mmap(0, 1024, PROT_READ | PROT_WRITE, MAP_SHARED, mem, PADDR);
-        //pckt.vaddr = (unsigned long)mmap(NULL, sizeof(unsigned long), PROT_READ | PROT_WRITE, MAP_SHARED, mem, PADDR);
+        pckt.vaddr = (unsigned long)mmap(NULL, sizeof(unsigned long), PROT_READ | PROT_WRITE, MAP_SHARED, mem, PADDR);
         pckt.paddr = 0;
 
         fd = open(DBFS_FILE_PATH, O_RDWR);
@@ -40,6 +39,9 @@ int main(void)
                 printf("debugfs input file write failed\n");
                 exit(-1);
         }
+
+	printf("%p / %p / %p \n" ,pckt.vaddr, pckt.paddr, PADDR);
+
 
         assert(pckt.paddr == PADDR);
         printf("[TEST CASE]    PASS\n");

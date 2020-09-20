@@ -4,6 +4,7 @@
 #include <linux/uaccess.h>
 #include <asm/pgtable.h>
 
+#define PADDR_MASK 0x0000ffffffffffff
 
 MODULE_LICENSE("GPL");
 
@@ -45,42 +46,27 @@ static ssize_t read_output(struct file *fp,
 	struct page* page; 
 
 	// if 5 level 
-	printk("vaddr :%p\n",vaddr);
 	pgd = pgd_offset(task->mm, vaddr);
-	printk("pgd : %p\n", *pgd);
 	if (pgd_none(*pgd) && pgd_bad(*pgd))
 		goto done;
 	p4d = p4d_offset(pgd, vaddr);
-	printk("p4d : %p\n", *p4d);
 	if (p4d_none(*p4d) && p4d_bad(*p4d))
 		goto done;
 	pud = pud_offset(p4d, vaddr);
-	printk("pud : %p\n", *pud);
 	if (pud_none(*pud) && pud_bad(*pud))
 		goto done;
 	pmd = pmd_offset(pud, vaddr);
-	printk("pmd : %p\n", pmd);
 
 	pte = pte_offset_kernel(pmd, vaddr);
-	printk("pte : %p\n", pte);
-
-	page = pte_page(*pte);
-	
-	printk("pte_val = 0x%lx\n", pte_val(*pte));
-	printk("pte_index = %lu\n", pte_index(vaddr));
-	if (pte_none(*pte)) {
-		printk("not mapped in pte\n");
-		return -1;
-	}
-
 	/* Page frame physical address mechanism | offset */
-	page_addr = pte_val(*pte) & PAGE_MASK;
-	page_offset = vaddr & ~PAGE_MASK;
-	paddr = page_addr | page_offset;
-	pckt.paddr = paddr;
 
-	printk("paddr : %p\n",pckt.paddr);
-	copy_to_user(user_buffer, &pckt,  sizeof(struct packet));
+	page_addr = pte_val(*pte) & PAGE_MASK;
+	page_addr = page_addr & PADDR_MASK;
+
+
+	pckt.paddr = page_addr;
+	printk("paddr :%lx\n",pckt.paddr);
+	copy_to_user(user_buffer, &pckt, length);
 done:
 	return length;
 
